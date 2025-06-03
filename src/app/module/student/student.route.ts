@@ -1,10 +1,8 @@
 import express from 'express';
+import { StudentController } from './student.controller';
 
 const router = express.Router();
 
-router.get('/', studentControllers.getAllStudents);
-router.get('/:id', studentControllers.getSingleStudentById);
-router.patch('/:id', validaterequest(studentValidations.udpateStudentValidationSchema), studentControllers.updateStudent);
-router.delete('/:id', studentControllers.deleteStudent);
+router.get('/', StudentController.getAllStudents);
 
 export const StudentRoutes = router;
