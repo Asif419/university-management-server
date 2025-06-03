@@ -97,13 +97,38 @@ const studentSchema = new Schema<TStudent>({
     {
         toJSON: {
             virtuals: true,
-        },
+        }, // to create virtuals data
     },
 )
 
+// pre middleware
+studentSchema.pre('find', function (next) {
+    this.find({ isDeleted: { $ne: true } });
+    next();
+})
+
+studentSchema.pre('findOne', function (next) {
+    this.find({ isDeleted: { $ne: true } });
+    next();
+})
+
+studentSchema.pre('aggregate', function (next) {
+    this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+    next();
+})
+
+// virtual
+studentSchema.virtual('fullname').get(function () {
+    if (typeof this?.name?.middleName == 'undefined') {
+        return `${this?.name?.firstName} ${this?.name.lastName}`;
+    } else {
+        return `${this?.name?.firstName} ${this?.name?.middleName} ${this?.name?.lastName}`;
+    };
+})
+
 // creting a custom static method
 studentSchema.statics.isUserExists = async function (id: string) {
-    const existUser = await Student.findOne({id});
+    const existUser = await Student.findOne({ id });
     return existUser;
 };
 
