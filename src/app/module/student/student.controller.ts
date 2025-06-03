@@ -1,7 +1,11 @@
 import httpStatus from 'http-status';
+import catchAsync from '../../utils/catchAsync';
+import sendResponse from '../../utils/sendResponse';
+import { StudentServices } from './student.service';
 
 const getAllStudents = catchAsync(async(req, res) => {
-    const result = await StudentServices.getAllStudentsFromDB(req.query);
+    // remaining ...
+    const result = await StudentServices.getAllStudentsFromDB();
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -10,3 +14,7 @@ const getAllStudents = catchAsync(async(req, res) => {
         data: result,
     });
 });
+
+export const StudentController = {
+    getAllStudents,
+}
