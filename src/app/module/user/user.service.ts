@@ -6,11 +6,17 @@ import { User } from "./user.model";
 import AppError from "../../errors/AppError";
 import HttpStatus from "http-status";
 import { Student } from "../student/student.model";
+import { AcademicSemester } from "../academicSemester/academicSemester.model";
+import { generateStudentId } from "./user.utils";
 
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
     const userData: Partial<TUser> = {};
 
-    // remaining ...
+    const admissionSemester = await AcademicSemester.findById(payload.admissionSemester);
+
+    if(admissionSemester == null) {
+        throw new AppError (HttpStatus.NOT_FOUND, 'Something went wrong');
+    }
 
     // start a session
     const session = await mongoose.startSession();
@@ -19,8 +25,8 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
         // start the transaction
         session.startTransaction();
 
-        // remaining ...
-        userData.id = "1234";
+        
+        userData.id = await generateStudentId(admissionSemester);
         userData.password = password || (config.default_password as string);
         userData.role = 'student';
 
@@ -50,8 +56,7 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     } catch (err) {
         await session.abortTransaction();
         await session.endSession();
-        // throw new Error('Failed to create Students');
-        console.error("Student creation failed:", err);
+        throw new Error('Failed to create Students');
     };
 };
 
