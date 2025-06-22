@@ -46,7 +46,7 @@ const createFacultyValidationSchema = z.object({
             bloodGroup: z
                 .enum(['O+', 'O-', 'A+', 'A-', 'AB+', 'AB-', 'B+', 'B-']),
             presentAddress: z.string().min(1, 'Present Address is required'),
-            premanentAddress: z.string().min(1, 'Permanent Address is required'),
+            permanentAddress: z.string().min(1, 'Permanent Address is required'),
             academicDepartment: z.string(),
             profileImg: z
                 .string()

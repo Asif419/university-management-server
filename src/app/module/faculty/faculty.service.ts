@@ -57,15 +57,16 @@ const deleteFacultyFromDB = async (_id: string) => {
 
     try {
         session.startTransaction();
-
+        
         const deletedFaculty = await Faculty.findByIdAndUpdate(
-            { _id },
+            _id,
             { isDeleted: true },
             {
                 new: true,
                 session,
             },
         );
+
         if(!deletedFaculty) {
             throw new AppError(HttpStatus.BAD_REQUEST, 'Failed to delete Faculty');
         };
@@ -83,12 +84,12 @@ const deleteFacultyFromDB = async (_id: string) => {
             throw new AppError(HttpStatus.BAD_REQUEST, 'Failed to delete User');
         };
 
-        await session.commitTransaction;
+        await session.commitTransaction();
         await session.endSession();
 
     } catch (err) {
-        session.abortTransaction();
-        session.endSession();
+        await session.abortTransaction();
+        await session.endSession();
         throw new Error('Failed to delete');
     }
 }
