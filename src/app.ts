@@ -19,7 +19,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 // error handlers
-// app.use(globalErrorHandler);
+app.use(globalErrorHandler);
 app.use(notFound);
 
 export default app;
