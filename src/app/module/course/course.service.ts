@@ -122,6 +122,11 @@ const deleteCourseFromDB = async (id: string) => {
     return result;
 };
 
+const getCourseFacultiesFromDB = async(id: string) => {
+    const result = await CourseFaculty.findById(id).populate('faculties');
+    return result;
+}
+
 const assignFacultiesInCourseIntoDB = async (
     id: string,
     payload: Partial<TCourseFaculty>
@@ -165,6 +170,7 @@ export const CourseServices = {
     getSingleCoursesFromDB,
     updateCourseIntoDB,
     deleteCourseFromDB,
+    getCourseFacultiesFromDB,
     assignFacultiesInCourseIntoDB,
     removeFacultiesInCourseIntoDB,
 };
