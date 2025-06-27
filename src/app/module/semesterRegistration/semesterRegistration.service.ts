@@ -1,3 +1,4 @@
+import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../errors/AppError";
 import { AcademicSemester } from "../academicSemester/academicSemester.model";
 import { RegistrationStatus } from "./semesterRegistration.constant";
@@ -32,7 +33,7 @@ const createSemesterRegistrationIntoDB = async (payload: TSemesterRegistration) 
         academicSemester: academicSemesterID
     });
 
-    if(isSemesterAlreadyRegistered) {
+    if (isSemesterAlreadyRegistered) {
         throw new AppError(HttpStatus.CONFLICT, 'This semester is already registered');
     };
 
@@ -41,3 +42,99 @@ const createSemesterRegistrationIntoDB = async (payload: TSemesterRegistration) 
     return result;
 };
 
+const getAllSemesterRegistrationFromDB = async (query: Record<string, unknown>) => {
+    const semesterRegistraitonQery = new QueryBuilder(
+        SemesterRegistration.find().populate('academicSemester'),
+        query
+    )
+        .filter()
+        .sort()
+        .paginate()
+        .fields()
+    const result = await semesterRegistraitonQery.modelQuery;
+
+    return result;
+};
+
+const getSingleSemesterRegistrationFromDB = async (id: string) => {
+    const result = await SemesterRegistration.findById(id);
+
+    return result;
+};
+
+const updateSemesterRegistrationIntoDB = async (id: string, payload: Partial<TSemesterRegistration>) => {
+
+    // check if the semester is exist or not
+    const isAcademicSemesterExists = await SemesterRegistration.findById(id);
+
+    if (!isAcademicSemesterExists) {
+        throw new AppError(HttpStatus.NOT_FOUND, 'This Academic Semester is not found');
+    };
+
+    // if the requested semester-registration status is ended: then no update will happen
+    const currentSemesterStatus = isAcademicSemesterExists?.status;
+    const requestedSemesterStatus = payload?.status;
+    if (currentSemesterStatus === RegistrationStatus.ENDED) {
+        throw new AppError(HttpStatus.BAD_REQUEST, `This semester is already ${currentSemesterStatus}`);
+    };
+
+    // upcoming = > ongoing = > ended
+    // upcoming => ongoing => ended
+    if (
+        currentSemesterStatus === RegistrationStatus.UPCOMING &&
+        requestedSemesterStatus === RegistrationStatus.ENDED
+    ) {
+        throw new AppError(
+            HttpStatus.BAD_REQUEST,
+            `You can't directly change status from ${currentSemesterStatus} to ${requestedSemesterStatus}`,
+        );
+    }
+
+    if (
+        currentSemesterStatus === RegistrationStatus.ONGOING &&
+        requestedSemesterStatus === RegistrationStatus.UPCOMING
+    ) {
+        throw new AppError(
+            HttpStatus.BAD_REQUEST,
+            `You can't directly change status from ${currentSemesterStatus} to ${requestedSemesterStatus}`,
+        );
+    }
+
+    const result = await SemesterRegistration.findByIdAndUpdate(id, payload, {
+        new: true,
+        runValidators: true,
+    });
+
+    return result;
+};
+
+const deleteSemesterRegistrationFromDB = async (id: string) => {
+    const isSemesterRegistrationExists = await SemesterRegistration.findById(id);
+
+    if(!isSemesterRegistrationExists) {
+        throw new AppError(HttpStatus.NOT_FOUND, 'Semester Registration is not found');
+    };
+
+    if (isSemesterRegistrationExists?.status !== 'UPCOMING') {
+        throw new AppError(HttpStatus.BAD_REQUEST, 'You can not delete this registered semester');
+    };
+
+    // reamining
+
+    const deleteSemesterRegistration = await SemesterRegistration.findByIdAndDelete(id, {
+        new: true,
+    });
+    if(!deleteSemesterRegistration) {
+        throw new AppError(HttpStatus.BAD_REQUEST, 'Failed to delete Semester Registration');
+    };
+    
+    return deleteSemesterRegistration;
+};
+
+export const SemesterRegistrationServices = {
+    createSemesterRegistrationIntoDB,
+    getAllSemesterRegistrationFromDB,
+    getSingleSemesterRegistrationFromDB,
+    updateSemesterRegistrationIntoDB,
+    deleteSemesterRegistrationFromDB,
+};
