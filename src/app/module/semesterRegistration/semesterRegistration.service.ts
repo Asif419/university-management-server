@@ -22,9 +22,9 @@ const createSemesterRegistrationIntoDB = async (payload: TSemesterRegistration) 
     };
 
     // check if the semester is exist or not
-    const isAcademicSemsterExists = await AcademicSemester.findById(academicSemesterID);
+    const isAcademicSemesterExists = await AcademicSemester.findById(academicSemesterID);
 
-    if (!isAcademicSemsterExists) {
+    if (!isAcademicSemesterExists) {
         throw new AppError(HttpStatus.NOT_FOUND, 'This Academic Semester is not found');
     };
 

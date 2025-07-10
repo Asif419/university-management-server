@@ -14,7 +14,7 @@ const createAcademicSemester: RequestHandler = catchAsync(async (req, res) => {
     });
 });
 
-const getAcademicSemsters: RequestHandler = catchAsync(async (requestAnimationFrame, res) => {
+const getAcademicSemesters: RequestHandler = catchAsync(async (requestAnimationFrame, res) => {
     const result = await AcademicSemesterServices.getAllAcademicSemestersFromDB();
 
     sendResponse(res, {
@@ -25,7 +25,7 @@ const getAcademicSemsters: RequestHandler = catchAsync(async (requestAnimationFr
     });
 });
 
-const getSingleAcademicSemster: RequestHandler = catchAsync(async (req, res) => {
+const getSingleAcademicSemester: RequestHandler = catchAsync(async (req, res) => {
     const academicSemesterID = req.params.academicSemesterID;
     const result = await AcademicSemesterServices.getSingleSemesterByIDFromDB(academicSemesterID);
 
@@ -37,7 +37,7 @@ const getSingleAcademicSemster: RequestHandler = catchAsync(async (req, res) => 
     });
 });
 
-const updateAcademicSemster: RequestHandler = catchAsync(async (req, res) => {
+const updateAcademicSemester: RequestHandler = catchAsync(async (req, res) => {
     const academicSemesterID = req.params.academicSemesterID;
     const semesterData = req.body;
     const result = await AcademicSemesterServices.updateAcademicSemester(
@@ -55,7 +55,7 @@ const updateAcademicSemster: RequestHandler = catchAsync(async (req, res) => {
 
 export const academicSemesterControllers = {
     createAcademicSemester,
-    getAcademicSemsters,
-    getSingleAcademicSemster,
-    updateAcademicSemster,
+    getAcademicSemesters,
+    getSingleAcademicSemester,
+    updateAcademicSemester,
 };

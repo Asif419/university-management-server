@@ -12,7 +12,7 @@ router.post(
 );
 
 router.patch(
-    ':/id',
+    '/:id',
     validateRequest(OfferedCourseValidaitons.updateOfferedCourseValidationSchema),
     OfferedCourseControllers.updateOfferedCourse,
 );
